@@ -260,32 +260,30 @@ From mac terminal;<br>
 ### Step 3. `cd algo`<br>
 
 ### Step 4. Install the remaing Algo dependencies<br>
-		`sudo python3 -m virtualenv --python="$(command -v python3)" .env`<br>
-		 `source .env/bin/activate`<br>
-		`python3 -m pip install -U pip virtualenv`<br>
-		`python3 -m pip install -r requirements.txt`<br>
+`sudo python3 -m virtualenv --python="$(command -v python3)" .en`<br>
+`source .env/bin/activate`<br>
+`python3 -m pip install -U pip virtualenv`<br>
+`python3 -m pip install -r requirements.txt`
 
-### Step 5. `./algo`<br>
-	5a. Update python to python 3.8<br>
-		`sudo add-apt-repository ppa:deadsnakes/ppa`<br>
-		`sudo apt-get update`<br>
-		`sudo apt-get install python3.8`<br>
-	5b. Update path<br>
-		`echo 'export PATH="/usr/bin:/usr/local/bin:$PATH"' >> ~/.bashrc`<br>
-		`source ~/.bashrc`<br>
-	5c. Run ./algo again<br>
-		`./algo`<br>
-
+### Step 5. `./algo`
+#### Step 5a. Update python to python 3.8
+`sudo add-apt-repository ppa:deadsnakes/ppa`<br>
+`sudo apt-get update`<br>
+`sudo apt-get install python3.8`
+#### Step 5b. Update path
+`echo 'export PATH="/usr/bin:/usr/local/bin:$PATH"' >> ~/.bashrc`<br>
+`source ~/.bashrc`
+#### Step 5c. Run ./algo again
+`./algo`
 ### Step 6. Firewall needs to be restarted
-	`sudo ufw enable`
-	
+`sudo ufw enable`
 ### 7. Import conf file to Wireguard on your local machine
-	`scp -P 41235 username@<IP>:~/algo/configs/<IP>/wireguard/username.conf ~/Downloads/`
+`scp -P 41235 username@<IP>:~/algo/configs/<IP>/wireguard/username.conf ~/Downloads/`
 ### Step 8. Open Wireguard and select the file copied from the server to the local terminal in step 8
 
 # Add **color coding** to the terminal
 ### Step 1. Modifying the PS1 environment variable, which controls the prompt that appears in the terminal. Open the .bashrc file in your home directory using a text editor such as nano or vim<br>
-		`nano ~/.bashrc`<br>
+`nano ~/.bashrc`
 ### Step 2. Scroll to the bottom of the file and add the following lines:<br>
 `# Define some colors`<br>
 `RED="\[\033[0;31m\]"`<br>
