@@ -304,19 +304,25 @@ ERROR occured at step 5:
 `
 
 # Add aliases
-	Clear command, which clears the screen
-		`alias c='clear'`
-	Update in one command
-		`alias update='sudo apt-get update && sudo apt-get upgrade'`
-	Get server cpu info
-		`alias cpuinfo='lscpu'`
-To show all aliases
-	`aliases`
+### Go into file to add aliases
+- `nano ~/.bashrc`<br>
+- Add following aliases: <br>
+	Clear command, which clears the screen<br>
+		`alias c='clear'`<br>
+	Update in one command<br>
+		`alias update='sudo apt-get update && sudo apt-get upgrade'`<br>
+	Get server cpu info<br>
+		`alias cpuinfo='lscpu'`<br>
+- Then reload the file with aliases saved and ready to execute:<br>
+`source ~/.bashrc`<br>
+- To show all aliases<br>
+	`aliases`<br>
+#### Important note - When adding aliases do not put spaces before or after the equal sign
 
 # Creating 3 cronjobs
-	1. Edit the cron jobs list by running the following command:
-		`sudo crontab -e`
-	2. Select nano
+	1. Edit the cron jobs list by running the following command:<br>
+		`sudo crontab -e`<br>
+	2. Select nano<br>
 ![[Pasted image 20230424203847.png]]
 
 	3. Add cronjob lines
