@@ -81,6 +81,7 @@
 	`sudo update-ca-certificates`
 
 # Set-up and Configure OPENVPN Server
+#### Reference: https://www.digitalocean.com/community/tutorials/how-to-set-up-and-configure-an-openvpn-server-on-ubuntu-22-04
 ### Step 1. (In droplet OPENVPNserver)  Install OPENVPN and Easy-RSA
 `sudo apt update`<br>
 `sudo apt install openvpn easy-rsa`<br>
@@ -140,7 +141,8 @@
 `sudo chown username_here.username_here ~/client-configs/keys/*`<br>
 
 ## IMPORTANT NOTE
-Before Step 7, you can now power off the CAserver droplet and use the OPENVPNserver droplet for the rest of the steps
+Before Step 7, you can now power off the CAserver droplet and use the OPENVPNserver droplet for the rest of the steps<br>
+- In CAserver droplet enter;<br>
 `shutdown`
 
 ### Step 7. Configuring OPENVPN
@@ -148,160 +150,154 @@ Before Step 7, you can now power off the CAserver droplet and use the OPENVPNser
 `sudo cp /usr/share/doc/openvpn/examples/sample-config-files/server.conf /etc/openvpn/server/`<br>
 `sudo nano /etc/openvpn/server/server.conf`<br>
 - Search for the tls-auth directive. This line will be enabled by default. Comment it out by adding a ; to the beginning of the line. Then add a new line after it containing the value tls-crypt ta.key only:<br>
-	![Screenshot][Pasted image 20230413000719.png]	<br>
+	![image](https://user-images.githubusercontent.com/46617761/235441722-8d5d954d-7937-4b66-834a-25f254a85258.png)<br>
 - The default value is set to AES-256-CBC, however, the AES-256-GCM cipher offers a better level of encryption, performance, and is well supported in up-to-date OpenVPN clients. Comment out the default value by adding a ; sign to the beginning of this line, and then add another line after it containing the updated value of AES-256-GCM:<br>
-	![[Pasted image 20230413000837.png]]<br>
+	![image](https://user-images.githubusercontent.com/46617761/235441758-02a08353-7c57-4043-8225-1622daabf339.png)<br>
 - Right after the cipher AES-256-GCM add:<br>
 	![[Pasted image 20230413001029.png]]<br>
 - Add auth SHA256 and Comment out the existing line that looks like dh dh2048.pem or dh dh.pem. The filename for the Diffie-Hellman key may be different than what is listed in the example server configuration file. Then add a line after it with the contents dh none:<br>
-	![[Pasted image 20230413001046.png]]<br>
+	![image](https://user-images.githubusercontent.com/46617761/235441870-ff4b0ba3-73b9-4f4c-96e6-10743ee2f433.png)<br>
+	![image](https://user-images.githubusercontent.com/46617761/235441831-38c110f1-acfc-411e-ad2b-35f558b27620.png)
 - Uncomment user nobody and group nogroup (this may say nobody, change it to nogroup)<br>
-	![[Pasted image 20230413001143.png]]<br>
+	![image](https://user-images.githubusercontent.com/46617761/235441904-3dabfd90-c50f-48fd-b2ad-caf0b0eae7e2.png)<br>
 - Uncomment:<br>
-	![[Pasted image 20230413001232.png]]<br>
-	![[Pasted image 20230413001246.png]]<br>
+	![image](https://user-images.githubusercontent.com/46617761/235441938-4eb743bf-84bd-43b3-b240-4b3933858d99.png)<br>
+	![image](https://user-images.githubusercontent.com/46617761/235441956-b6e42ba5-abcf-43a0-9ae3-a4aa56eca222.png)<br>
 - Adjust port from port 1194 to port 443 amd change to proto tcp<br>
 - Since we are switching from UDP to TCP, change the explicit-exit-notify directive’s value from 1 to 0<br>
-	![[Pasted image 20230413001437.png]]<br>
+	![image](https://user-images.githubusercontent.com/46617761/235441986-fae30ce7-4174-4cb3-a06c-38f0d75e7775.png)<br>
 
 ### Step 8. Adjust the OPENVPN Server Networking Configuration
-`sudo nano /etc/sysctl.conf`
-- Add the following to the end of the file:
-	net.ipv4.ip_forward = 1
-- To check:
-	`sudo sysctl -p`
+`sudo nano /etc/sysctl.conf`<br>
+- Add the following to the end of the file:<br>
+	net.ipv4.ip_forward = 1<br>
+- To check:<br>
+	`sudo sysctl -p`<br>
 
 ### Step 9. Firewall Configuration
-`ip route list default`
-`sudo nano /etc/ufw/before.rules`
-- Towards the top of the file, add the highlighted lines below. This will set the default policy for the POSTROUTING chain in the nat table and masquerade any traffic coming from the VPN. Remember to replace eth0 in the -A POSTROUTING line below with the interface you found in the above command:
-			`# START OPENVPN RULES
-			``# NAT table rules
-			``*nat
-			``:POSTROUTING ACCEPT [0:0]
-			``# Allow traffic from OpenVPN client to eth0 (change to the interface you discovered!)
-			``-A POSTROUTING -s 10.8.0.0/8 -o eth0 -j MASQUERADE
-			``COMMIT
-			``# END OPENVPN RULES
-`sudo nano /etc/default/ufw`
-- Inside, find the DEFAULT_FORWARD_POLICY directive and change the value from DROP to ACCEPT:
-	![[Pasted image 20230413003759.png]]
-`sudo ufw allow 443/tcp`
-`sudo ufw allow OpenSSH`
-`sudo ufw allow 53/udp
-`sudo ufw allow OpenSSH`
+`ip route list default`<br>
+`sudo nano /etc/ufw/before.rules`<br>
+- Towards the top of the file, add the highlighted lines below. This will set the default policy for the POSTROUTING chain in the nat table and masquerade any traffic coming from the VPN. Remember to replace eth0 in the -A POSTROUTING line below with the interface you found in the above command:<br>
+			`# START OPENVPN RULES<br>
+			# NAT table rules<br>
+			*nat<br>
+			:POSTROUTING ACCEPT [0:0]<br>
+			# Allow traffic from OpenVPN client to eth0 (change to the interface you discovered!)<br>
+			-A POSTROUTING -s 10.8.0.0/8 -o eth0 -j MASQUERADE<br>
+			COMMIT<br>
+			# END OPENVPN RULES`<br>
+`sudo nano /etc/default/ufw`<br>
+- Inside, find the DEFAULT_FORWARD_POLICY directive and change the value from DROP to ACCEPT:<br>
+	![image](https://user-images.githubusercontent.com/46617761/235442170-fca2e615-544c-4877-8d04-36eced6d2640.png)<br>
+`sudo ufw allow 443/tcp`<br>
+`sudo ufw allow OpenSSH`<br>
+`sudo ufw allow 53/udp`<br>
+`sudo ufw allow OpenSSH`<br>
 
 ### Step 10. Starting OPENVPN
-`sudo systemctl -f enable openvpn-server@server.service`
-`sudo systemctl start openvpn-server@server.service`
-- Check to see if it running
+`sudo systemctl -f enable openvpn-server@server.service`<br>
+`sudo systemctl start openvpn-server@server.service`<br>
+- Check to see if it running<br>
 `sudo systemctl status openvpn-server@server.service`
 
 ### Step 11. Create Client Configuration Infrastructure
-`mkdir -p ~/client-configs/files`
-`cp /usr/share/doc/openvpn/examples/sample-config-files/client.conf ~/client-configs/base.conf`
-`nano ~/client-configs/base.conf`
-- In the file replace the text after remote with server IP and port 443 and proto tcp:
-	![[Pasted image 20230413004425.png]]
-	![[Pasted image 20230413004454.png]]
-- Uncomment:
-	![[Pasted image 20230413004522.png]]
-- Comment out:
-	![[Pasted image 20230413004557.png]]
-	![[Pasted image 20230413004614.png]]
-- Add:
-	![[Pasted image 20230413004637.png]]
-	![[Pasted image 20230413004657.png]]
-- Add these uncommented out lines anywhere:
-	![[Pasted image 20230413004738.png]]
-	![[Pasted image 20230413004752.png]]
-- Create a script:
-`nano ~/client-configs/make_config.sh`
-	- Add the content below:
-		![[Pasted image 20230413004937.png]]
-- Make executable:
+`mkdir -p ~/client-configs/files`<br>
+`cp /usr/share/doc/openvpn/examples/sample-config-files/client.conf ~/client-configs/base.conf`<br>
+`nano ~/client-configs/base.conf`<br>
+- In the file replace the text after remote with server IP and port 443 and proto tcp:<br>
+	![image](https://user-images.githubusercontent.com/46617761/235442241-5efdce34-54cf-4662-8a78-155b342e54cb.png)<br>
+- Uncomment:<br>
+	![image](https://user-images.githubusercontent.com/46617761/235442294-da6d69f0-a502-4c1b-8ae8-a28200062721.png)<br>
+- Comment out:<br>
+	![image](https://user-images.githubusercontent.com/46617761/235442327-d600e6cf-9bfd-4a42-8d39-7b9c4d2ec0a6.png)<br>
+	![image](https://user-images.githubusercontent.com/46617761/235442349-2084392d-cf97-475c-911f-bb5ab9633efc.png)<br>
+- Add:<br>
+	![image](https://user-images.githubusercontent.com/46617761/235442373-63f55e10-c791-44ef-bc32-05675106918f.png)<br>
+	![image](https://user-images.githubusercontent.com/46617761/235442392-e578fdbf-ae1e-4059-b06e-a38305adba9c.png)<br>
+- Add these uncommented out lines anywhere:<br>
+	`; script-security 2<br>
+	; up /etc/openvpn/update-resolv-conf<br>
+	; down /etc/openvpn/update-resolv-conf`<br>
+- Create a script:<br>
+`nano ~/client-configs/make_config.sh`<br>
+	- Add the content below:<br>
+	![image](https://user-images.githubusercontent.com/46617761/235442731-21f4129a-fb06-4b34-afdd-eb7d4fecb859.png)<br>
+- Make executable:<br>
 	`chmod 700 ~/client-configs/make_config.sh`
 
 ### Step 12. Generate Client Configuration 
-`cd ~/client-configs`
-`./make_config.sh client1`
-`ls ~/client-configs/files`
-- You need to transfer this file to the device you plan to use as the client. For instance, this could be your local computer or a mobile device. **Execute command on local terminal (I have a mac)
-`sftp -P 41235 username_here@openvpn_server_ip:client-configs/files/client1.ovpn ~/`
+`cd ~/client-configs`<br>
+`./make_config.sh client1`<br>
+`ls ~/client-configs/files`<br>
+- You need to transfer this file to the device you plan to use as the client. For instance, this could be your local computer or a mobile device.<br> **Execute command on local terminal (I have a mac)<br>
+`sftp -P 41235 username_here@openvpn_server_ip:client-configs/files/client1.ovpn ~/`<br>
 
 ### Step 13. Install Client Configurations
-macOS - [Tunnelblick Downloads page](https://tunnelblick.net/downloads.html) 
-- Double-click the .dmg file and folow the prompts to install
-	- Towards the end of the installation process, Tunnelblick will ask if you have any configuration files. Answer I have configuration files and let Tunnelblick finish. Open a Finder window and double-click client1.ovpn. Tunnelblick will install the client profile. Administrative privileges are required.
+macOS - [Tunnelblick Downloads page](https://tunnelblick.net/downloads.html) <br>
+- Double-click the .dmg file and folow the prompts to install<br>
+	- Towards the end of the installation process, Tunnelblick will ask if you have any configuration files. Answer I have configuration files and let Tunnelblick finish. Open a Finder window and double-click client1.ovpn. Tunnelblick will install the client profile. Administrative privileges are required.<br>
 		- Connecting: Launch Tunnelblick by double-clicking the Tunnelblick icon in the Applications folder. Once Tunnelblick has been launched, there will be a Tunnelblick icon in the menu bar at the top right of the screen for controlling connections. Click on the icon, and then the Connect client1 menu item to initiate the VPN connection. If you are using custom DNS settings with Tunnelblick, you may need check “Allow changes to manually-set network settings” in the advanced configuration dialog.
 
 ### Step 14. Test VPN Connection
-To test connection go to  [DNSLeakTest](https://www.dnsleaktest.com/)
-- The site will return the IP address assigned by your internet service provider and as you appear to the rest of the world. To check your DNS settings through the same website, click on Extended Test and it will tell you which DNS servers you are using.
+To test connection go to  [DNSLeakTest](https://www.dnsleaktest.com/)<br>
+- The site will return the IP address assigned by your internet service provider and as you appear to the rest of the world. To check your DNS settings through the same website, click on Extended Test and it will tell you which DNS servers you are using.<br>
 	- Now connect the OpenVPN client to your Droplet’s VPN and refresh the browser. A completely different IP address (that of your VPN server) should now appear, and this is how you appear to the world. Again, DNSLeakTest’s Extended Test will check your DNS settings and confirm you are now using the DNS resolvers pushed by your VPN.
 
 
-# Deploy the Algo ServerTake2
-Link reference for deploying the slgo server : https://github.com/trailofbits/algo
+# Deploy the Algo Server
+Link reference for deploying the slgo server : https://github.com/trailofbits/algo<br>
 
-From mac terminal ssh user@hostname -p 41235
-sudo usermod -aG sudo username
+From mac terminal;<br>
+`ssh user@hostname -p 41235`<br>
+`sudo usermod -aG sudo username`<br>
 
-	1. Get a copy of the Algo scripts
-		`git clone https://github.com/trailofbits/algo.git`
+### Step 1. Get a copy of the Algo scripts<br>
+		`git clone https://github.com/trailofbits/algo.git`<br>
 
-	2. Install Algo dependicies
-		`sudo apt install -y --no-install-recommends python3-virtualenv`
+### Step 2. Install Algo dependicies<br>
+		`sudo apt install -y --no-install-recommends python3-virtualenv`<br>
 
-	3. `cd algo`
+### Step 3. `cd algo`<br>
 
-	4. Install the remaing Algo dependencies
-		`sudo python3 -m virtualenv --python="$(command -v python3)" .env
-		 `source .env/bin/activate`
-		`python3 -m pip install -U pip virtualenv`
-		`python3 -m pip install -r requirements.txt`
+### Step 4. Install the remaing Algo dependencies<br>
+		`sudo python3 -m virtualenv --python="$(command -v python3)" .env<br>
+		 `source .env/bin/activate`<br>
+		`python3 -m pip install -U pip virtualenv`<br>
+		`python3 -m pip install -r requirements.txt`<br>
 
-	5. `./algo`
-ERROR occured at step 5:
-		![[Pasted image 20230424173341.png]]
-	5a. Update python to python 3.8
-		`sudo add-apt-repository ppa:deadsnakes/ppa
-		`sudo apt-get update
-		`sudo apt-get install python3.8`
-	5b. Update path
-		`echo 'export PATH="/usr/bin:/usr/local/bin:$PATH"' >> ~/.bashrc
-		`source ~/.bashrc`
-	5c. Run ./algo again
-		`./algo`
-		![[Pasted image 20230424173854.png]]
-6. Final result should look like:
-	![[Pasted image 20230424173951.png]]
+### Step 5. `./algo`<br>
+	5a. Update python to python 3.8<br>
+		`sudo add-apt-repository ppa:deadsnakes/ppa<br>
+		`sudo apt-get update<br>
+		`sudo apt-get install python3.8`<br>
+	5b. Update path<br>
+		`echo 'export PATH="/usr/bin:/usr/local/bin:$PATH"' >> ~/.bashrc<br>
+		`source ~/.bashrc`<br>
+	5c. Run ./algo again<br>
+		`./algo`<br>
 
-7. Firewall needs to be restarted
+### Step 6. Firewall needs to be restarted
 	`sudo ufw enable`
 	
-8. Import conf file to Wireguard on your local machine
+### 7. Import conf file to Wireguard on your local machine
 	`scp -P 41235 username@<IP>:~/algo/configs/<IP>/wireguard/username.conf ~/Downloads/`
-9. Open Wireguard and select the file copied from the server to the local terminal in step 8
-10. Result
-	![[Pasted image 20230424174300.png]]
+### Step 8. Open Wireguard and select the file copied from the server to the local terminal in step 8
 
 # Add **color coding** to the terminal
-	1. Modifying the PS1 environment variable, which controls the prompt that appears in the terminal. Open the .bashrc file in your home directory using a text editor such as nano or vim
-		`nano ~/.bashrc`
-	2. Scroll to the bottom of the file and add the following lines:
-		`# Define some colors
-`RED="\[\033[0;31m\]"
-`GREEN="\[\033[0;32m\]"
-`YELLOW="\[\033[0;33m\]"
-`BLUE="\[\033[0;34m\]"
-`PURPLE="\[\033[0;35m\]"
-`CYAN="\[\033[0;36m\]"
-`WHITE="\[\033[0;37m\]"
-`RESET="\[\033[0m\]"`
-	`#Set the prompt to include colors
-`PS1="${GREEN}\u${YELLOW}@${RED}\h${YELLOW}:${BLUE}\w${RESET}$ "
-`
+### Step 1. Modifying the PS1 environment variable, which controls the prompt that appears in the terminal. Open the .bashrc file in your home directory using a text editor such as nano or vim<br>
+		`nano ~/.bashrc`<br>
+### Step 2. Scroll to the bottom of the file and add the following lines:<br>
+`# Define some colors`<br>
+`RED="\[\033[0;31m\]"`<br>
+`GREEN="\[\033[0;32m\]"`<br>
+`YELLOW="\[\033[0;33m\]"`<br>
+`BLUE="\[\033[0;34m\]"`<br>
+`PURPLE="\[\033[0;35m\]"`<br>
+`CYAN="\[\033[0;36m\]"`<br>
+`WHITE="\[\033[0;37m\]"`<br>
+`RESET="\[\033[0m\]"`<br>
+	`#Set the prompt to include colors`<br>
+`PS1="${GREEN}\u${YELLOW}@${RED}\h${YELLOW}:${BLUE}\w${RESET}$ "`<br>
 
 # Add aliases
 ### Go into file to add aliases
@@ -320,26 +316,26 @@ ERROR occured at step 5:
 #### Important note - When adding aliases do not put spaces before or after the equal sign
 
 # Creating 3 cronjobs
-	1. Edit the cron jobs list by running the following command:<br>
+### Step 1. Edit the cron jobs list by running the following command:<br>
 		`sudo crontab -e`<br>
-	2. Select nano<br>
-![[Pasted image 20230424203847.png]]
+### Step 2. Select nano<br>
+![image](https://user-images.githubusercontent.com/46617761/235439750-3743aa90-da7f-49b7-a451-4fa8f48739ec.png)<br>
 
-	3. Add cronjob lines
-		CRONJOB 1
-			- In the editor, add the following line to schedule the system updates for every Sunday at midnight:
-				`0 0 * * 0 apt update && apt upgrade -y`
-		CRONJOB 2
-			- This cron job will delete all files in the specified directory that are older than 7 days every day at 2:00 AM.
-				`0 2 * * * find /path/to/directory -type f -mtime +7 -delete`
-		CRONJOB 3
-			- This cron job will create a compressed backup file of the specified directory every day at 1:00 AM.
-				`0 1 * * * tar -czf /path/to/backup.tar.gz /path/to/directory`
+### Step 3. Add cronjob lines<br>
+- CRONJOB 1<br>
+			- In the editor, add the following line to schedule the system updates for every Sunday at midnight:<br>
+			`0 0 * * 0 apt update && apt upgrade -y`<br>
+- CRONJOB 2<br>
+			- This cron job will send an email reminder every Friday at 5pm.<br>
+			`0 17 * * 5 echo "Don't forget to submit your Custom Cloud VPN Project!" | mail -s "Reminder" user@example.com`<br>
+- CRONJOB 3<br>
+			- This cron job will clean up old log files every day at 3am.<br>
+			`0 3 * * * find /var/log -type f -mtime +7 -exec rm {} \;`<br>
 
 
 
 # In the video - 
-- -   Launch a browser and navigate to your Github-pages hosted installation documentation 
+-   Launch a browser and navigate to your Github-pages hosted installation documentation 
 -   VM operation and configuration: Show the following in your video
 -   Log into the server
 -   Launch a shell and show the IP address of your VM
@@ -352,6 +348,7 @@ ERROR occured at step 5:
 	- `update`
 	- `cpuinfo`
 -   ssh into Sal's DigitalOcean server (he will provide login credentials separately)
--   show any cool customizations (if any) you did
+-   show any cool customizations (if any) you did 
+	- Adding the color coding
 -   show the three cronjobs you included and discuss what they do; show related scripts
 -   show yourself connecting to your custom cloud VPN server using OpenVPN and Wireguard clients and also IPSec from your main laptop
