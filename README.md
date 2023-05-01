@@ -245,33 +245,33 @@ To test connection go to  [DNSLeakTest](https://www.dnsleaktest.com/)<br>
 
 
 # Deploy the Algo Server
-Link reference for deploying the slgo server : https://github.com/trailofbits/algo<br>
+Link reference for deploying the slgo server : https://github.com/trailofbits/algo <br>
 
 From mac terminal;<br>
 `ssh user@hostname -p 41235`<br>
 `sudo usermod -aG sudo username`<br>
 
 ### Step 1. Get a copy of the Algo scripts<br>
-		`git clone https://github.com/trailofbits/algo.git`<br>
+`git clone https://github.com/trailofbits/algo.git`<br>
 
 ### Step 2. Install Algo dependicies<br>
-		`sudo apt install -y --no-install-recommends python3-virtualenv`<br>
+`sudo apt install -y --no-install-recommends python3-virtualenv`<br>
 
 ### Step 3. `cd algo`<br>
 
 ### Step 4. Install the remaing Algo dependencies<br>
-		`sudo python3 -m virtualenv --python="$(command -v python3)" .env<br>
+		`sudo python3 -m virtualenv --python="$(command -v python3)" .env`<br>
 		 `source .env/bin/activate`<br>
 		`python3 -m pip install -U pip virtualenv`<br>
 		`python3 -m pip install -r requirements.txt`<br>
 
 ### Step 5. `./algo`<br>
 	5a. Update python to python 3.8<br>
-		`sudo add-apt-repository ppa:deadsnakes/ppa<br>
-		`sudo apt-get update<br>
+		`sudo add-apt-repository ppa:deadsnakes/ppa`<br>
+		`sudo apt-get update`<br>
 		`sudo apt-get install python3.8`<br>
 	5b. Update path<br>
-		`echo 'export PATH="/usr/bin:/usr/local/bin:$PATH"' >> ~/.bashrc<br>
+		`echo 'export PATH="/usr/bin:/usr/local/bin:$PATH"' >> ~/.bashrc`<br>
 		`source ~/.bashrc`<br>
 	5c. Run ./algo again<br>
 		`./algo`<br>
