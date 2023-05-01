@@ -19,7 +19,7 @@
 `adduser username_here`<br>
 `usermod -aG sudo username_here`
 
-### Step 5. Set up Firewall and change deafault SSH port to 41235
+### Step 5. Set up Firewall and change default SSH port to 41235
 `ufw app list`<br>
 `ufw allow OpenSSH`<br>
 `ufw enable`<br>
