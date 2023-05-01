@@ -4,12 +4,13 @@
 - I used my @hawaii.edu account
 
 ### Step 2. Create a new droplet and name it **OPENVPNserver**. Make the selections below when creating the droplet:
-- Region - New York
-- Datecenter - NYC1
-- Image - Ubuntu
+- Reference to initial server set-up: [Initial Server Setup with Ubuntu 22.04](https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubuntu-22-04) 
+	- Region - New York
+	- Datecenter - NYC1
+	- Image - Ubuntu
 	- Version - 22.04 (LTS) x64
-- Size - Basic at $6/month
-- SSH or Password (I used password)
+	- Size - Basic at $6/month
+	- SSH or Password (I used password)
 
 ### Step 3. Open the console for the OPENVPNserver droplet and log in as root
 `ssh root@server_ip_address`
@@ -44,7 +45,7 @@
 	`sudo apt install easy-rsa`
   - Step 7b. Prepare a Public Key Infrastructure Directory<br>
 	`mkdir ~/easy-rsa`<br>
-	`ln -s /usr/share/easy-rsa/* ~/easy-rsa/<br>
+	`ln -s /usr/share/easy-rsa/* ~/easy-rsa/`<br>
 	`chmod 700 /home/username_here/easy-rsa`<br>
 	`cd ~/easy-rsa`<br>
 	`./easyrsa init-pki`
@@ -153,10 +154,9 @@ Before Step 7, you can now power off the CAserver droplet and use the OPENVPNser
 	![image](https://user-images.githubusercontent.com/46617761/235441722-8d5d954d-7937-4b66-834a-25f254a85258.png)<br>
 - The default value is set to AES-256-CBC, however, the AES-256-GCM cipher offers a better level of encryption, performance, and is well supported in up-to-date OpenVPN clients. Comment out the default value by adding a ; sign to the beginning of this line, and then add another line after it containing the updated value of AES-256-GCM:<br>
 	![image](https://user-images.githubusercontent.com/46617761/235441758-02a08353-7c57-4043-8225-1622daabf339.png)<br>
-- Right after the cipher AES-256-GCM add:<br>
-	![[Pasted image 20230413001029.png]]<br>
-- Add auth SHA256 and Comment out the existing line that looks like dh dh2048.pem or dh dh.pem. The filename for the Diffie-Hellman key may be different than what is listed in the example server configuration file. Then add a line after it with the contents dh none:<br>
+- Right after the cipher AES-256-GCM add auth SHA256:<br>
 	![image](https://user-images.githubusercontent.com/46617761/235441870-ff4b0ba3-73b9-4f4c-96e6-10743ee2f433.png)<br>
+- Add auth SHA256 and Comment out the existing line that looks like dh dh2048.pem or dh dh.pem. The filename for the Diffie-Hellman key may be different than what is listed in the example server configuration file. Then add a line after it with the contents dh none:<br>
 	![image](https://user-images.githubusercontent.com/46617761/235441831-38c110f1-acfc-411e-ad2b-35f558b27620.png)
 - Uncomment user nobody and group nogroup (this may say nobody, change it to nogroup)<br>
 	![image](https://user-images.githubusercontent.com/46617761/235441904-3dabfd90-c50f-48fd-b2ad-caf0b0eae7e2.png)<br>
