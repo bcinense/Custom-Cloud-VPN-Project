@@ -328,25 +328,4 @@ From mac terminal;<br>
 			`0 17 * * 5 echo "Don't forget to submit your Custom Cloud VPN Project!" | mail -s "Reminder" user@example.com`<br>
 - CRONJOB 3<br>
 			- This cron job will clean up old log files every day at 3am.<br>
-			`0 3 * * * find /var/log -type f -mtime +7 -exec rm {} \;`<br>
-
-
-
-# In the video - 
--   Launch a browser and navigate to your Github-pages hosted installation documentation 
--   VM operation and configuration: Show the following in your video
--   Log into the server
--   Launch a shell and show the IP address of your VM
--   Show the user list
-	- `cut -d: -f1 /etc/passwd | grep -vE '^#|^$'`
--   Show the sudoers
-	- `getent group sudo`
--   Demonstrate some of your aliases
-	- `c`
-	- `update`
-	- `cpuinfo`
--   ssh into Sal's DigitalOcean server (he will provide login credentials separately)
--   show any cool customizations (if any) you did 
-	- Adding the color coding
--   show the three cronjobs you included and discuss what they do; show related scripts
--   show yourself connecting to your custom cloud VPN server using OpenVPN and Wireguard clients and also IPSec from your main laptop
+			`0 3 * * * find /var/log -type f -mtime +7 -exec rm {} \;`
